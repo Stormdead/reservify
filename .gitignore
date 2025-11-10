@@ -41,3 +41,9 @@ backend/.env
 .env
 .env.local
 .env.*.local
+
+# Test coverage
+coverage.out
+coverage.html
+*.test
+*.cover
