@@ -1,0 +1,687 @@
+bookit-system/
+├── backend/
+│   ├── cmd/
+│   │   └── api/
+│   │       └── main.go                    # Punto de entrada
+│   │
+│   ├── config/
+│   │   ├── config.go                      # Configuración general
+│   │   └── database.go                    # Conexión a MySQL
+│   │
+│   ├── models/                            # MODELS - Migraciones automáticas
+│   │   ├── user.go                        # Modelo User + AutoMigrate
+│   │   ├── resource.go                    # Modelo Resource + AutoMigrate
+│   │   ├── availability_slot.go           # Modelo AvailabilitySlot
+│   │   ├── booking.go                     # Modelo Booking + AutoMigrate
+│   │   ├── notification.go                # Modelo Notification
+│   │   └── migrate.go                     # Función central de migración
+│   │
+│   ├── controllers/                       # CONTROLLERS - Lógica HTTP
+│   │   ├── auth_controller.go             # Login, Register, Refresh
+│   │   ├── user_controller.go             # CRUD usuarios
+│   │   ├── resource_controller.go         # CRUD recursos
+│   │   ├── booking_controller.go          # CRUD reservaciones
+│   │   ├── availability_controller.go     # Gestión de horarios
+│   │   ├── notification_controller.go     # Notificaciones
+│   │   └── dashboard_controller.go        # Estadísticas
+│   │
+│   ├── services/                          # SERVICES - Lógica de negocio
+│   │   ├── auth_service.go                # Autenticación JWT
+│   │   ├── user_service.go                # Lógica de usuarios
+│   │   ├── resource_service.go            # Lógica de recursos
+│   │   ├── booking_service.go             # Validación de reservas
+│   │   ├── availability_service.go        # Cálculo de disponibilidad
+│   │   ├── notification_service.go        # Envío de notificaciones
+│   │   └── email_service.go               # Servicio de email
+│   │
+│   ├── repositories/                      # REPOSITORIES - Acceso a datos
+│   │   ├── user_repository.go
+│   │   ├── resource_repository.go
+│   │   ├── booking_repository.go
+│   │   ├── availability_repository.go
+│   │   └── notification_repository.go
+│   │
+│   ├── middleware/
+│   │   ├── auth_middleware.go             # Validación JWT
+│   │   ├── cors_middleware.go             # CORS config
+│   │   ├── admin_middleware.go            # Verificar role admin
+│   │   └── logger_middleware.go           # Request logging
+│   │
+│   ├── routes/
+│   │   ├── routes.go                      # Todas las rutas
+│   │   ├── auth_routes.go                 # Rutas de autenticación
+│   │   ├── user_routes.go                 # Rutas de usuarios
+│   │   ├── resource_routes.go             # Rutas de recursos
+│   │   └── booking_routes.go              # Rutas de reservas
+│   │
+│   ├── dto/                               # Data Transfer Objects
+│   │   ├── auth_dto.go                    # LoginRequest, RegisterRequest
+│   │   ├── user_dto.go                    # UserResponse, UpdateUserRequest
+│   │   ├── resource_dto.go                # CreateResourceRequest, etc.
+│   │   └── booking_dto.go                 # CreateBookingRequest, etc.
+│   │
+│   ├── utils/
+│   │   ├── jwt.go                         # Generación y validación JWT
+│   │   ├── password.go                    # Hash y comparación bcrypt
+│   │   ├── validator.go                   # Validaciones custom
+│   │   ├── response.go                    # Respuestas HTTP estandarizadas
+│   │   └── pagination.go                  # Paginación
+│   │
+│   ├── tests/
+│   │   ├── unit/
+│   │   │   ├── services/
+│   │   │   └── repositories/
+│   │   └── integration/
+│   │       └── api/
+│   │
+│   ├── .env.example
+│   ├── .env
+│   ├── go.mod
+│   ├── go.sum
+│   ├── Dockerfile
+│   └── README.md
+│
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── core/                      # Servicios singleton
+│   │   │   │   ├── guards/
+│   │   │   │   │   ├── auth.guard.ts
+│   │   │   │   │   └── admin.guard.ts
+│   │   │   │   ├── interceptors/
+│   │   │   │   │   ├── auth.interceptor.ts
+│   │   │   │   │   └── error.interceptor.ts
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── auth.service.ts
+│   │   │   │   │   ├── api.service.ts
+│   │   │   │   │   └── toast.service.ts
+│   │   │   │   └── core.module.ts
+│   │   │   │
+│   │   │   ├── shared/                    # Componentes compartidos
+│   │   │   │   ├── components/
+│   │   │   │   │   ├── navbar/
+│   │   │   │   │   ├── sidebar/
+│   │   │   │   │   ├── loader/
+│   │   │   │   │   └── confirm-dialog/
+│   │   │   │   ├── pipes/
+│   │   │   │   ├── directives/
+│   │   │   │   └── shared.module.ts
+│   │   │   │
+│   │   │   ├── features/                  # Módulos de funcionalidades
+│   │   │   │   ├── auth/
+│   │   │   │   │   ├── login/
+│   │   │   │   │   ├── register/
+│   │   │   │   │   ├── auth-routing.module.ts
+│   │   │   │   │   └── auth.module.ts
+│   │   │   │   │
+│   │   │   │   ├── dashboard/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── dashboard-home/
+│   │   │   │   │   │   ├── stats-card/
+│   │   │   │   │   │   └── recent-bookings/
+│   │   │   │   │   ├── dashboard-routing.module.ts
+│   │   │   │   │   └── dashboard.module.ts
+│   │   │   │   │
+│   │   │   │   ├── resources/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── resource-list/
+│   │   │   │   │   │   ├── resource-detail/
+│   │   │   │   │   │   ├── resource-form/
+│   │   │   │   │   │   └── resource-card/
+│   │   │   │   │   ├── services/
+│   │   │   │   │   │   └── resource.service.ts
+│   │   │   │   │   ├── resources-routing.module.ts
+│   │   │   │   │   └── resources.module.ts
+│   │   │   │   │
+│   │   │   │   ├── bookings/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── booking-calendar/
+│   │   │   │   │   │   ├── booking-form/
+│   │   │   │   │   │   ├── booking-list/
+│   │   │   │   │   │   └── booking-detail/
+│   │   │   │   │   ├── services/
+│   │   │   │   │   │   └── booking.service.ts
+│   │   │   │   │   ├── bookings-routing.module.ts
+│   │   │   │   │   └── bookings.module.ts
+│   │   │   │   │
+│   │   │   │   ├── admin/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── admin-dashboard/
+│   │   │   │   │   │   ├── user-management/
+│   │   │   │   │   │   ├── resource-management/
+│   │   │   │   │   │   └── booking-management/
+│   │   │   │   │   ├── admin-routing.module.ts
+│   │   │   │   │   └── admin.module.ts
+│   │   │   │   │
+│   │   │   │   └── profile/
+│   │   │   │       ├── components/
+│   │   │   │       │   ├── profile-view/
+│   │   │   │       │   └── profile-edit/
+│   │   │   │       ├── profile-routing.module.ts
+│   │   │   │       └── profile.module.ts
+│   │   │   │
+│   │   │   ├── models/                    # Interfaces TypeScript
+│   │   │   │   ├── user.model.ts
+│   │   │   │   ├── resource.model.ts
+│   │   │   │   ├── booking.model.ts
+│   │   │   │   ├── notification.model.ts
+│   │   │   │   └── api-response.model.ts
+│   │   │   │
+│   │   │   ├── app-routing.module.ts
+│   │   │   ├── app.component.ts
+│   │   │   ├── app.component.html
+│   │   │   ├── app.component.scss
+│   │   │   └── app.module.ts
+│   │   │
+│   │   ├── assets/
+│   │   │   ├── images/
+│   │   │   ├── icons/
+│   │   │   └── styles/
+│   │   │
+│   │   ├── environments/
+│   │   │   ├── environment.ts
+│   │   │   └── environment.prod.ts
+│   │   │
+│   │   ├── index.html
+│   │   ├── main.ts
+│   │   └── styles.scss
+│   │
+│   ├── angular.json
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── Dockerfile
+│   └── README.md
+│
+├── docker-compose.yml
+├── .gitignore
+├── .env.example
+└── README.md
+
+🎯 FASES DE DESARROLLO - BOOKIT SYSTEM
+📦 FASE 0: Setup Inicial del Proyecto (1-2 días)
+Objetivo: Configurar infraestructura base y repositorio
+
+Issues:
+Configuración del Repositorio
+
+Crear estructura de carpetas backend/frontend
+Configurar .gitignore
+README.md principal con documentación
+Licencia del proyecto
+Setup Backend - Go + Gin
+
+Inicializar go mod
+Instalar dependencias (Gin, GORM, JWT, etc.)
+Configurar .env y config/
+Estructura MVC básica
+Setup Frontend - Angular
+
+ng new con configuración
+Instalar Angular Material
+Configurar environments
+Estructura de carpetas (core, shared, features)
+Docker + MySQL
+
+docker-compose.yml con MySQL
+Configuración de red entre servicios
+Scripts de inicialización
+CI/CD Básico
+
+GitHub Actions para testing
+Linter Go y Angular
+Entregables:
+
+✅ Proyecto corre localmente
+✅ Base de datos MySQL operativa
+✅ Backend responde en localhost:8080
+✅ Frontend corre en localhost:4200
+🗄️ FASE 1: Base de Datos y Modelos (2-3 días)
+Objetivo: Definir todos los modelos y migración automática
+
+Issues:
+Modelo User
+
+Definir struct con GORM tags
+Validaciones
+Métodos auxiliares
+Modelo Resource
+
+Definir struct completo
+Relaciones con otros modelos
+Validaciones de negocio
+Modelo AvailabilitySlot
+
+Horarios disponibles
+Relación con Resource
+Modelo Booking
+
+Reservaciones con validaciones
+Relaciones User y Resource
+Índices para búsquedas
+Modelo Notification
+
+Sistema de notificaciones
+Relaciones
+Sistema de Migración Automática
+
+migrate.go con AutoMigrate
+Función SeedData para datos de prueba
+Integración en main.go
+Entregables:
+
+✅ Todas las tablas se crean automáticamente
+✅ Base de datos con datos de prueba
+✅ Relaciones funcionando correctamente
+🔐 FASE 2: Autenticación y Autorización (3-4 días)
+Objetivo: Sistema completo de auth con JWT
+
+Backend:
+Utils de Seguridad
+
+utils/password.go (bcrypt)
+utils/jwt.go (generar y validar tokens)
+utils/validator.go
+DTOs de Autenticación
+
+LoginRequest, RegisterRequest
+AuthResponse con token
+RefreshTokenRequest
+Auth Repository
+
+Crear usuario
+Buscar por email
+Actualizar último login
+Auth Service
+
+Lógica de registro
+Lógica de login
+Validación de credenciales
+Refresh token
+Auth Controller
+
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/refresh
+POST /api/auth/logout
+Middlewares
+
+auth_middleware.go (validar JWT)
+admin_middleware.go (verificar role)
+cors_middleware.go
+Frontend:
+Auth Service Angular
+
+Métodos login, register, logout
+Guardar token en localStorage
+Observable para estado de auth
+Auth Interceptor
+
+Agregar token a requests
+Manejo de errores 401
+Auth Guard
+
+Proteger rutas autenticadas
+Admin guard para rutas admin
+Login Component
+
+Formulario reactivo
+Validaciones
+Redirección después de login
+Register Component
+
+Formulario de registro
+Validación de contraseñas
+Mensajes de error
+Entregables:
+
+✅ Usuario puede registrarse
+✅ Usuario puede hacer login
+✅ JWT funciona correctamente
+✅ Rutas protegidas en frontend
+👤 FASE 3: Gestión de Usuarios (2-3 días)
+Objetivo: CRUD completo de usuarios
+
+Backend:
+User Repository
+
+FindAll con paginación
+FindByID
+Update
+Delete (soft delete)
+User Service
+
+Lógica de actualización
+Validaciones de negocio
+Cambio de contraseña
+User Controller
+
+GET /api/users (admin)
+GET /api/users/:id
+PUT /api/users/:id
+DELETE /api/users/:id
+GET /api/users/me (perfil actual)
+Frontend:
+User Service Angular
+
+Métodos CRUD
+getProfile()
+Profile Component
+
+Ver perfil del usuario
+Editar datos personales
+Cambiar contraseña
+User Management (Admin)
+
+Lista de usuarios con tabla
+Filtros y búsqueda
+Editar/eliminar usuarios
+Entregables:
+
+✅ Usuario puede ver/editar su perfil
+✅ Admin puede gestionar usuarios
+✅ Paginación funcionando
+🏢 FASE 4: Gestión de Recursos (3-4 días)
+Objetivo: CRUD de recursos/servicios reservables
+
+Backend:
+Resource Repository
+
+CRUD completo
+Filtros por categoría
+Búsqueda por nombre
+Resource Service
+
+Validaciones de negocio
+Subida de imágenes (opcional)
+Activar/desactivar recursos
+Resource Controller
+
+GET /api/resources (público)
+GET /api/resources/:id
+POST /api/resources (admin)
+PUT /api/resources/:id (admin)
+DELETE /api/resources/:id (admin)
+Availability Repository
+
+CRUD de horarios disponibles
+Obtener disponibilidad por recurso
+Availability Controller
+
+GET /api/resources/:id/availability
+POST /api/resources/:id/availability (admin)
+PUT /api/availability/:id (admin)
+DELETE /api/availability/:id (admin)
+Frontend:
+Resource Service Angular
+
+Métodos CRUD
+Filtros y búsqueda
+Resource List Component
+
+Cards de recursos
+Filtros por categoría
+Búsqueda
+Resource Detail Component
+
+Vista detallada
+Mostrar disponibilidad
+Botón "Reservar"
+Resource Form (Admin)
+
+Crear/editar recursos
+Upload de imágenes
+Validaciones
+Availability Management (Admin)
+
+Configurar horarios por día
+Agregar/eliminar slots
+Entregables:
+
+✅ CRUD de recursos funcionando
+✅ Gestión de disponibilidad
+✅ Vista pública de recursos
+✅ Panel admin para recursos
+📅 FASE 5: Sistema de Reservaciones (4-5 días)
+Objetivo: Core del sistema - crear y gestionar reservas
+
+Backend:
+Booking Repository
+
+CRUD completo
+Filtros por usuario, recurso, fechas
+Verificar conflictos de horario
+Booking Service
+
+Validar disponibilidad
+Calcular precio total
+Prevenir double-booking
+Cambiar estado de reserva
+Booking Controller
+
+POST /api/bookings (crear)
+GET /api/bookings (listar propias)
+GET /api/bookings/:id
+PUT /api/bookings/:id (editar)
+DELETE /api/bookings/:id (cancelar)
+GET /api/admin/bookings (todas - admin)
+PATCH /api/bookings/:id/status (admin)
+Validación de Conflictos
+
+Algoritmo para detectar overlapping
+Verificar capacidad del recurso
+Frontend:
+Booking Service Angular
+
+Métodos CRUD
+Verificar disponibilidad
+Booking Calendar Component
+
+Integrar FullCalendar
+Mostrar reservas existentes
+Click en fecha para reservar
+Booking Form Component
+
+Selector de recurso
+Selector de fecha/hora
+Cálculo de precio en tiempo real
+Validaciones
+My Bookings Component
+
+Lista de reservas del usuario
+Filtros por estado
+Cancelar reserva
+Booking Detail Component
+
+Ver detalles completos
+Estados (pending, confirmed, etc.)
+Acciones según estado
+Admin Booking Management
+
+Todas las reservas
+Aprobar/rechazar
+Estadísticas
+Entregables:
+
+✅ Usuario puede crear reservas
+✅ Validación de conflictos funciona
+✅ Calendario interactivo
+✅ Admin puede gestionar todas las reservas
+✅ Cálculo de precios correcto
+🔔 FASE 6: Sistema de Notificaciones (2-3 días)
+Objetivo: Notificar acciones importantes
+
+Backend:
+Notification Repository
+
+CRUD de notificaciones
+Marcar como leídas
+Obtener no leídas
+Notification Service
+
+Crear notificación al reservar
+Notificar cambios de estado
+Notificar cancelaciones
+Notification Controller
+
+GET /api/notifications
+PATCH /api/notifications/:id/read
+DELETE /api/notifications/:id
+Email Service (Opcional)
+
+Enviar emails con SMTP
+Templates de emails
+Notificar por email
+Frontend:
+Notification Service Angular
+
+Polling o WebSocket
+Badge con contador
+Notification Bell Component
+
+Ícono en navbar
+Dropdown con notificaciones
+Marcar como leída
+Notification List Component
+
+Todas las notificaciones
+Filtrar leídas/no leídas
+Entregables:
+
+✅ Notificaciones en tiempo real
+✅ Badge con contador
+✅ Emails opcionales
+📊 FASE 7: Dashboard y Estadísticas (3-4 días)
+Objetivo: Visualización de datos
+
+Backend:
+Dashboard Service
+
+Estadísticas generales
+Reservas por mes
+Recursos más populares
+Ingresos totales
+Dashboard Controller
+
+GET /api/dashboard/stats
+GET /api/admin/dashboard (admin)
+Frontend:
+Dashboard Home Component
+
+Resumen para usuarios
+Próximas reservas
+Recursos favoritos
+Admin Dashboard Component
+
+Gráficas con Chart.js
+KPIs principales
+Tablas de resumen
+Stats Components
+
+Cards de estadísticas
+Gráficas de barras/líneas
+Exportar reportes (opcional)
+Entregables:
+
+✅ Dashboard de usuario funcional
+✅ Dashboard de admin con gráficas
+✅ Estadísticas precisas
+✅ FASE 8: Testing (3-4 días)
+Objetivo: Asegurar calidad del código
+
+Backend:
+Unit Tests - Services
+
+auth_service_test.go
+booking_service_test.go
+resource_service_test.go
+Unit Tests - Repositories
+
+Tests con base de datos de prueba
+Integration Tests
+
+Tests de endpoints
+Tests de flujos completos
+Frontend:
+Unit Tests - Services
+
+auth.service.spec.ts
+booking.service.spec.ts
+Component Tests
+
+Tests de componentes críticos
+Tests de formularios
+E2E Tests (Opcional)
+
+Cypress o Protractor
+Flujos principales
+Entregables:
+
+✅ Cobertura de tests > 70%
+✅ CI/CD ejecutando tests
+✅ Tests pasando
+🎨 FASE 9: UI/UX y Mejoras (2-3 días)
+Objetivo: Pulir interfaz y experiencia
+
+Diseño Responsivo
+
+Mobile first
+Tablets y desktop
+Temas y Estilos
+
+Angular Material theming
+Paleta de colores consistente
+Animaciones suaves
+UX Improvements
+
+Loading states
+Mensajes de error claros
+Confirmaciones de acciones
+Accessibility
+
+ARIA labels
+Keyboard navigation
+Contrast ratios
+Entregables:
+
+✅ Aplicación responsiva
+✅ UI profesional
+✅ Buena experiencia de usuario
+🚀 FASE 10: Deployment y Documentación (2-3 días)
+Objetivo: Publicar y documentar
+
+Dockerización Completa
+
+Dockerfile para backend
+Dockerfile para frontend
+docker-compose para producción
+Deployment Backend
+
+Railway, Render o Fly.io
+Variables de entorno
+Base de datos en la nube
+Deployment Frontend
+
+Vercel o Netlify
+Configuración de environment prod
+Documentación API
+
+Swagger/OpenAPI
+Postman collection
+README con endpoints
+Documentación General
+
+README principal
+Guía de instalación
+Arquitectura del sistema
+Screenshots
+Video Demo
+
+Grabar demo del sistema
+Subir a YouTube
+Agregar al README
+Entregables:
+
+✅ Sistema en producción
+✅ Documentación completa
+✅ Video demo
+✅ Listo para LinkedIn
