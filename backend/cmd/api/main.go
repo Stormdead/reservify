@@ -3,6 +3,7 @@ package main
 import (
 	"Reservify/config"
 	"Reservify/models"
+	"Reservify/routes"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -26,14 +27,6 @@ func main() {
 	// Crear router
 	router := gin.Default()
 
-	// Ruta de prueba
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-			"app":     config.AppConfig.AppName,
-			"version": "1.0.0",
-		})
-	})
 	// Ruta de health check
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -41,6 +34,9 @@ func main() {
 			"database": "connected",
 		})
 	})
+
+	// Configurar rutas
+	routes.SetupRoutes(router)
 
 	// Iniciar servidor
 	port := ":" + config.AppConfig.Port

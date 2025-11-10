@@ -103,8 +103,8 @@ El frontend estará disponible en `http://localhost:4200`
 ## 📋 Roadmap de Desarrollo
 
 - [x] Fase 0: Setup inicial
-- [ ] Fase 1: Base de datos y modelos
-- [ ] Fase 2: Autenticación y autorización
+- [x] Fase 1: Base de datos y modelos
+- [x] Fase 2: Autenticación y autorización
 - [ ] Fase 3: Gestión de usuarios
 - [ ] Fase 4: Gestión de recursos
 - [ ] Fase 5: Sistema de reservaciones
