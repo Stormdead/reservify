@@ -14,15 +14,17 @@ const (
 )
 
 type User struct {
-	ID           uint           `gorm:"primaryKey" json:"id"`
-	Email        string         `gorm:"uniqueIndex;not null;size:255" json:"email"`
-	PasswordHash string         `gorm:"not null;size:255" json:"-"`
-	FullName     string         `gorm:"not null;size:255" json:"full_name"`
-	Phone        string         `gorm:"size:20" json:"phone"`
-	Role         UserRole       `gorm:"type:varchar(20);default:'user'" json:"role"`
-	CreatedAt    time.Time      `json:"created_at"`
-	UpdatedAt    time.Time      `json:"updated_at"`
-	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	ID            uint           `gorm:"primaryKey" json:"id"`
+	Email         string         `gorm:"uniqueIndex;not null;size:255" json:"email"`
+	PasswordHash  string         `gorm:"not null;size:255" json:"-"`
+	FullName      string         `gorm:"not null;size:255" json:"full_name"`
+	Phone         string         `gorm:"size:20" json:"phone"`
+	Role          UserRole       `gorm:"type:varchar(20);default:'user'" json:"role"`
+	CreatedAt     time.Time      `json:"created_at"`
+	UpdatedAt     time.Time      `json:"updated_at"`
+	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
+	Bookings      []Booking      `gorm:"foreignKey:UserID" json:"bookings,omitempty"`
+	Notifications []Notification `gorm:"foreignKey:UserID" json:"notifications,omitempty"`
 }
 
 func (User) TableName() string {

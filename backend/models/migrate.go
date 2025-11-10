@@ -13,6 +13,10 @@ func AutoMigrate(db *gorm.DB) error {
 	//Lista de modelos a migrar
 	err := db.AutoMigrate(
 		&User{},
+		&Resource{},
+		&AvailabilitySlot{},
+		&Booking{},
+		&Notification{},
 	)
 	if err != nil {
 		return fmt.Errorf("Error en auto-migrate: %v", err)
