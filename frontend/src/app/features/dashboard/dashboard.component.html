@@ -1,0 +1,93 @@
+<!-- Navbar -->
+<mat-toolbar color="primary">
+  <span>Reservify</span>
+  <span class="spacer"></span>
+  <button mat-button routerLink="/dashboard">
+    <mat-icon>home</mat-icon>
+    Inicio
+  </button>
+  <button mat-button routerLink="/resources">
+    <mat-icon>category</mat-icon>
+    Recursos
+  </button>
+  <button mat-button routerLink="/bookings/my">
+    <mat-icon>event</mat-icon>
+    Mis Reservas
+  </button>
+  @if (authService.isAdmin()) {
+    <button mat-button routerLink="/admin">
+      <mat-icon>admin_panel_settings</mat-icon>
+      Admin
+    </button>
+  }
+  <button mat-button (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    Salir
+  </button>
+</mat-toolbar>
+
+<!-- Contenido -->
+<div class="dashboard-container">
+  <!-- Tarjeta de Bienvenida -->
+  <mat-card class="welcome-card">
+    <mat-card-header>
+      <mat-card-title>¡Bienvenido, {{ authService.currentUser()?.full_name }}!</mat-card-title>
+      <mat-card-subtitle>{{ authService.currentUser()?.email }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @if (authService.isAdmin()) {
+        <p class="admin-badge">🔑 Administrador</p>
+      }
+      <p>Rol: {{ authService.currentUser()?.role }}</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Acciones Rápidas -->
+  <div class="quick-actions">
+    <mat-card class="action-card" (click)="navigateTo('/resources')">
+      <mat-icon color="primary">category</mat-icon>
+      <h3>Ver Recursos</h3>
+      <p>Explora los recursos disponibles</p>
+    </mat-card>
+
+    <mat-card class="action-card" (click)="navigateTo('/bookings/my')">
+      <mat-icon color="accent">event</mat-icon>
+      <h3>Mis Reservas</h3>
+      <p>Gestiona tus reservaciones</p>
+    </mat-card>
+
+    @if (authService.isAdmin()) {
+      <mat-card class="action-card" (click)="navigateTo('/admin')">
+        <mat-icon color="warn">admin_panel_settings</mat-icon>
+        <h3>Panel Admin</h3>
+        <p>Gestión del sistema</p>
+      </mat-card>
+    }
+  </div>
+
+  <!-- Próximas Reservas -->
+  <mat-card class="upcoming-card">
+    <mat-card-header>
+      <mat-card-title>Próximas Reservas</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (loading) {
+        <p>Cargando...</p>
+      } @else if (upcomingBookings.length === 0) {
+        <p class="no-bookings">No tienes reservas próximas</p>
+      } @else {
+        <div class="bookings-list">
+          @for (booking of upcomingBookings; track booking.id) {
+            <div class="booking-item">
+              <h4>{{ booking.resource_name }}</h4>
+              <p>{{ booking.start_datetime | date:'medium' }}</p>
+              <span class="status-badge" [class]="'status-' + booking.status">
+                {{ booking.status }}
+              </span>
+            </div>
+          }
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

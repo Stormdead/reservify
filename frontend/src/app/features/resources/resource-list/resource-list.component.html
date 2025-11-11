@@ -1,0 +1,52 @@
+<div class="resources-container">
+  <h1>Recursos Disponibles</h1>
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Cargando recursos...</p>
+    </div>
+  } @else {
+    <div class="resources-grid">
+      @for (resource of resources; track resource.id) {
+        <mat-card class="resource-card">
+          <img mat-card-image [src]="resource.image_url || 'https://via.placeholder.com/300x200?text=Sin+Imagen'" [alt]="resource.name">
+          
+          <mat-card-header>
+            <mat-card-title>{{ resource.name }}</mat-card-title>
+            <mat-card-subtitle>
+              <mat-chip-set>
+                <mat-chip>{{ resource.category }}</mat-chip>
+                <mat-chip color="primary">{{ resource.capacity }} personas</mat-chip>
+              </mat-chip-set>
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <p class="description">{{ resource.description }}</p>
+            <p class="price">${{ resource.price_per_hour }} / hora</p>
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button mat-button color="primary" (click)="viewResource(resource.id)">
+              Ver Detalles
+            </button>
+            <button mat-raised-button color="accent" (click)="createBooking(resource.id)">
+              Reservar
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+
+    <!-- Paginación -->
+    <mat-paginator 
+      [length]="totalItems"
+      [pageSize]="pageSize"
+      [pageIndex]="currentPage"
+      [pageSizeOptions]="[6, 9, 12, 24]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  }
+</div>
