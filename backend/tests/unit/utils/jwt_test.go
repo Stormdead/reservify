@@ -6,13 +6,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/stretchr/testify/assert"
 )
 
 func init() {
 	// Setup: Configurar config para testing
 	config.AppConfig = &config.Config{
-		JWTSecret: "test-secret-key-for-testing",
+		JWTSecret:     "test-secret-key-for-testing",
+		JWTExpiration: time.Hour,
 	}
 }
 
@@ -71,4 +73,29 @@ func TestTokenExpiration(t *testing.T) {
 
 	// Verificar que ExpiresAt está en el futuro
 	assert.True(t, claims.ExpiresAt.Time.After(time.Now()), "ExpiresAt debería estar en el futuro")
+	assert.Equal(t, time.Hour, claims.ExpiresAt.Sub(claims.IssuedAt.Time))
+}
+
+func TestValidateTokenRejectsInvalidClaimsAndSignatures(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		method  jwt.SigningMethod
+		key     string
+		expires *jwt.NumericDate
+	}{
+		{"expired", jwt.SigningMethodHS256, config.AppConfig.JWTSecret, jwt.NewNumericDate(time.Now().Add(-time.Hour))},
+		{"missing expiration", jwt.SigningMethodHS256, config.AppConfig.JWTSecret, nil},
+		{"wrong signature", jwt.SigningMethodHS256, "different-test-key", jwt.NewNumericDate(time.Now().Add(time.Hour))},
+		{"unexpected algorithm", jwt.SigningMethodHS384, config.AppConfig.JWTSecret, jwt.NewNumericDate(time.Now().Add(time.Hour))},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			token, err := jwt.NewWithClaims(tc.method, &utils.Claims{UserID: 1, Role: "user", RegisteredClaims: jwt.RegisteredClaims{ExpiresAt: tc.expires}}).SignedString([]byte(tc.key))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err = utils.ValidateToken(token); err == nil {
+				t.Fatal("accepted invalid token")
+			}
+		})
+	}
 }

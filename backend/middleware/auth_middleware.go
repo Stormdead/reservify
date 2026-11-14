@@ -33,7 +33,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		// Validar el token
 		claims, err := utils.ValidateToken(tokenString)
 		if err != nil {
-			utils.ErrorResponse(c, http.StatusUnauthorized, "Token inválido o expirado", err)
+			utils.ErrorResponse(c, http.StatusUnauthorized, "Token inválido o expirado", nil)
 			c.Abort()
 			return
 		}

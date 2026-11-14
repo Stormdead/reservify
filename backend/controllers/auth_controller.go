@@ -73,7 +73,7 @@ func (ctrl *AuthController) GetMe(c *gin.Context) {
 	// Obtener el usuario
 	user, err := ctrl.authService.GetUserByID(userID.(uint))
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusNotFound, "Usuario no encontrado", err)
+		utils.ErrorResponse(c, http.StatusNotFound, "Usuario no encontrado", nil)
 		return
 	}
 
