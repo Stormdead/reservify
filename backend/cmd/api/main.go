@@ -12,7 +12,9 @@ import (
 func main() {
 	log.Println("Iniciando Reservify API")
 
-	config.LoadConfig()
+	if err := config.LoadConfig(); err != nil {
+		log.Fatal(err)
+	}
 	config.ConnectDatabase()
 
 	//Ejecutar migraciones automaticas

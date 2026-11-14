@@ -45,10 +45,16 @@ func (ctrl *UserController) GetUserByID(c *gin.Context) {
 		return
 	}
 
+	// Solo el dueño del perfil o un administrador puede consultarlo.
+	if c.GetUint("user_id") != uint(id) && c.GetString("user_role") != "admin" {
+		utils.ErrorResponse(c, http.StatusForbidden, "No tienes permisos para consultar este usuario", nil)
+		return
+	}
+
 	// Obtener usuario
 	user, err := ctrl.userService.GetUserByID(uint(id))
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusNotFound, err.Error(), nil)
+		utils.ErrorResponse(c, http.StatusNotFound, "Usuario no encontrado", nil)
 		return
 	}
 
