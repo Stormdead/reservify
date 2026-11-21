@@ -17,16 +17,16 @@ type Claims struct {
 
 // GenerateToken genera un JWT token para un usuario
 func GenerateToken(userID uint, email, role string) (string, error) {
-	expirationHours := 24 // Por defecto 24 horas
+	now := time.Now()
 
 	claims := &Claims{
 		UserID: userID,
 		Email:  email,
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(expirationHours))),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			NotBefore: jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(now.Add(config.AppConfig.JWTExpiration)),
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
 		},
 	}
 
@@ -41,19 +41,16 @@ func GenerateToken(userID uint, email, role string) (string, error) {
 
 // ValidateToken valida un JWT token y devuelve los claims
 func ValidateToken(tokenString string) (*Claims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		// Verificar el método de firma
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("método de firma inválido")
-		}
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(_ *jwt.Token) (interface{}, error) {
 		return []byte(config.AppConfig.JWTSecret), nil
-	})
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 
 	if err != nil {
 		return nil, err
 	}
 
-	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+	if claims, ok := token.Claims.(*Claims); ok && token.Valid && claims.ExpiresAt != nil && claims.UserID != 0 &&
+		(claims.Role == "user" || claims.Role == "admin") {
 		return claims, nil
 	}
 
